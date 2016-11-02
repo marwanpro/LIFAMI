@@ -1,4 +1,4 @@
-// Marwan XXXXXXXXXX
+// Marwan ZOGHLAMI p1608585
 // LIFAMI - Démineur
 
 /*
@@ -337,6 +337,7 @@ void leftClick(mCase table[DIMX][DIMY])
 
 	// Check if coords match a case, then get case with MousePos
 	#pragma region casecalc
+	if (mWon || mgameOver) return;
 	if (x < 20 || x > WINX - 20 || y < 20 || y > WINY - 60) return;
 	if ((x - 20) % (SIZE + 1) == 0 || (y - 20) % (SIZE + 1) == 0) return;
 
@@ -370,6 +371,7 @@ void rightClick(mCase table[DIMX][DIMY])
 
 	// Check if coords match a case, then get case with MousePos
 	#pragma region casecalc
+	if (mWon || mgameOver) return;
 	if (x < 20 || x > WINX - 20 || y < 20 || y > WINY - 60) return;
 	if ((x - 20) % (SIZE + 1) == 0 || (y - 20) % (SIZE + 1) == 0) return;
 	
