@@ -1,4 +1,4 @@
-// Marwan ZOGHLAMI p1608585
+// Marwan XXXXXXXXXX
 // LIFAMI - Démineur
 
 /*
@@ -7,9 +7,27 @@
  * Le démineur possède une coloration des cases automatiques ainsi que d'un timer et d'un indicateur de drapeau restant
  * Une ébauche non fonctionnel d'un systeme cascade (recursif) lors de la pression d'un 0 est inclus en commentaires
  * Si les #pragma region pose problèmes sous mingw ou gcc,  supprimez les
- *
  */
 
+
+/*
+ *  Project Name: Minesweeper++
+ *  Author: marwanpro ( marwan69120@live.fr )
+ *  Version: 0.0.4-ALPHA (Unstable)
+ *  Last Update: 02/11/2016 21:13 @ GMT +1
+ *  License: The Unlicensed
+ *
+ *  Additional License: Feel free to fork.
+ *
+ *  Description: Simple C++ Exercise. Detail above in french
+ *
+ *  Credits: N/A
+ *
+ *  Thread Link: N/A
+ *  Install Link: N/A
+ *  GitHub Link: https://github.com/marwanpro/LIFAMI/tree/master/Minesweeper
+ *
+ */
 
 
 #include <cstdlib>
@@ -24,16 +42,20 @@
 using namespace grapic;
 
 
-// Global Vars
-const int DIMX = 12;
-const int DIMY = 12;
-const int BOMB = 14;
+// Global Vars (EDITABLE)
+const int DIMX = 10;
+const int DIMY = 10;
+const int BOMB = 8;
 const bool DEBUG = true;
+
+
+// Tools Vars
 int glX = 0;
 int glY = 0;
 int randInt(int min, int max) { return min + (rand() % (int)(max - min + 1)); }
 
 // Grapic Vars
+
 const char title[CHMAX] = "Minesweeper++";
 const int SIZE = 32;
 const int WINX = 20 * 2 + (DIMX - 2) * SIZE + DIMX;
@@ -42,9 +64,9 @@ bool stop = false;
 
 // Game Vars
 clock_t startTime = clock();
-int loop = 0;
 bool mgameOver = false;
 bool mWon = false;
+bool mEnd = false;
 
 
 
@@ -248,22 +270,34 @@ void checkWin(mCase table[DIMX][DIMY])
 // End the game
 void finish()
 {
-	if (loop == 0)
+	if (isKeyPressed(SDLK_SPACE))
 	{
-		loop++;
-		return;
-		if (mWon)
-		{
-
-		}
-		if (mgameOver)
-		{
-
-		}
+		winQuit();
+		exit(0);
 	}
-	system("pause");
-	winQuit();
-	exit(0);
+	int elapsedTime = double(clock() - startTime) / CLOCKS_PER_SEC;
+	if (elapsedTime % 4 < 2)
+	{
+		mEnd = false;
+		return;
+	}
+	else mEnd = true;
+	fontSize(50);
+	if (mgameOver)
+	{
+		color(255, 0, 0);
+		print(55, WINY - 100, "LOSE");
+	}
+	if (mWon)
+	{
+		color(0, 255, 0);
+		print(55, WINY - 100, "WIN");
+	}
+	fontSize(24);
+	color(0, 0, 0);
+	print(55, WINY - 155, "Press Space to Exit");
+	fontSize(20);
+	
 }
 
 
@@ -299,7 +333,7 @@ void leftClick(mCase table[DIMX][DIMY])
 {
 	int x, y;
 	mousePos(x, y);
-	_sleep(150);
+	delay(150);
 
 	// Check if coords match a case, then get case with MousePos
 	#pragma region casecalc
@@ -313,10 +347,13 @@ void leftClick(mCase table[DIMX][DIMY])
 
 	if (DEBUG)
 	{
-		std::cout << "Case(" << caseX << "," << caseY << ")" << std::endl;
+		std::cout << "Case(" << caseX << "," << caseY << ")";
+		if (table[caseX][caseY].isFlagged) std::cout << " - Flagged";
+		std::cout << std::endl;
 	}
 
-	if (!table[caseX][caseY].isFlagged) table[caseX][caseY].isDisplayed = true;
+	if (table[caseX][caseY].isFlagged) return;
+	table[caseX][caseY].isDisplayed = true;
 
 	// Check if case is a Mine or not
 	if (!table[caseY][caseX].isFlagged && table[caseY][caseX].isBomb) gameOver(table);
@@ -329,7 +366,7 @@ void rightClick(mCase table[DIMX][DIMY])
 {
 	int x, y;
 	mousePos(x, y);
-	_sleep(150);
+	delay(150);
 
 	// Check if coords match a case, then get case with MousePos
 	#pragma region casecalc
@@ -350,12 +387,14 @@ void rightClick(mCase table[DIMX][DIMY])
 }
 
 
+// Grapic Init Void
 void grapicInit()
 {
 	backgroundColor(127, 127, 127);
 }
 
 
+// Draw black grid
 void gridDrawer()
 {
 	for ( int vl = 20; vl < WINX - 20; vl += SIZE + 1 )
@@ -384,6 +423,7 @@ void gridDrawer()
 }
 
 
+// Draw HUD at top
 void hud(mCase table[DIMX][DIMY])
 {
 	int remaining = mRemaining(table);
@@ -397,8 +437,11 @@ void hud(mCase table[DIMX][DIMY])
 }
 
 
+// Draw Void
 void draw(mCase table[DIMX][DIMY])
 {
+	if (mgameOver || mWon) finish();
+	if (mEnd) return;
 	gridDrawer();
 	if (isMousePressed(SDL_BUTTON_LEFT)) leftClick(table);
 	if (isMousePressed(SDL_BUTTON_RIGHT)) rightClick(table);
@@ -410,8 +453,7 @@ void draw(mCase table[DIMX][DIMY])
 		}
 	}
 	hud(table);
-	// recursive(table);
-	if (mgameOver || mWon) finish();
+	// recursive(table);  // Not working
 }
 
 
