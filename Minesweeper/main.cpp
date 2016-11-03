@@ -1,33 +1,34 @@
-// Marwan ZOGHLAMI p1608585
+// Marwan XXXXXXXXXX
 // LIFAMI - Démineur
 
 /*
- * Ce démineur a été crée avec Visual Studio 2015 et est fonctionnel 
- * Les 4 première variables sont éditables
- * Le démineur possède une coloration des cases automatiques ainsi que d'un timer et d'un indicateur de drapeau restant
- * Une ébauche non fonctionnel d'un systeme cascade (recursif) lors de la pression d'un 0 est inclus en commentaires
- * Si les #pragma region pose problèmes sous mingw ou gcc,  supprimez les
- */
+* Ce démineur a été crée avec Visual Studio 2015 et est fonctionnel
+* Les 4 première variables sont éditables
+* Je n'ai pas chargé d'image de mines pour eviter d'eventuels bugs dues au répertoires en cas d'utilisation avec un systeme POSIX/Unix
+* Le démineur possède une coloration des cases automatiques ainsi que d'un timer et d'un indicateur de drapeau restant
+* Effet fonctionnel d'un systeme cascade (recursif) lors de la pression d'un 0 
+* Si les #pragma region pose problèmes sous mingw ou gcc,  supprimez les
+*/
 
 
 /*
- *  Project Name: Minesweeper++
- *  Author: marwanpro ( marwan69120@live.fr )
- *  Version: 0.0.4-ALPHA (Unstable)
- *  Last Update: 02/11/2016 21:13 @ GMT +1
- *  License: The Unlicensed
- *
- *  Additional License: Feel free to fork.
- *
- *  Description: Simple C++ Exercise. Detail above in french
- *
- *  Credits: N/A
- *
- *  Thread Link: N/A
- *  Install Link: N/A
- *  GitHub Link: https://github.com/marwanpro/LIFAMI/tree/master/Minesweeper
- *
- */
+*  Project Name: Minesweeper++
+*  Author: marwanpro ( marwan69120@live.fr )
+*  Version: 0.0.4-ALPHA (Unstable)
+*  Last Update: 02/11/2016 21:13 @ GMT +1
+*  License: The Unlicensed
+*
+*  Additional License: Feel free to fork.
+*
+*  Description: Simple C++ Exercise. Detail above in french
+*
+*  Credits: N/A
+*
+*  Thread Link: N/A
+*  Install Link: N/A
+*  GitHub Link: https://github.com/marwanpro/LIFAMI/tree/master/Minesweeper
+*
+*/
 
 
 #include <cstdlib>
@@ -44,7 +45,7 @@ using namespace grapic;
 
 // Global Vars (EDITABLE)
 const int DIMX = 10;
-const int DIMY = 10;
+const int DIMY = DIMX;
 const int BOMB = 8;
 const bool DEBUG = true;
 
@@ -112,26 +113,22 @@ void init(mCase table[DIMX][DIMY])
 	{
 		int x = randInt(1, DIMX - 2);
 		int y = randInt(1, DIMY - 2);
-		if (table[x][y].isBomb == false && table[x][y].isVisible == true) table[x][y].isBomb = true;
+		if (!table[x][y].isBomb && table[x][y].isVisible) table[x][y].isBomb = true;
 		else i--;
 	}
 
 	// Count near bombs
 	for (glX = 1; glX < DIMX - 1; glX++)
 	{
-		//cout << "glX: " << glX;
 		for (glY = 1; glY < DIMY - 1; glY++)
 		{
-			//cout << ", glY: " << glY << endl;
 			for (int x = glX - 1; x <= glX + 1; x++)
 			{
 				for (int y = glY - 1; y <= glY + 1; y++)
 				{
-					//cout << "Case [" << glX << "][" << glY << "] : Checking (" << x << "," << y << ")" << endl;
 					if (table[x][y].isBomb == true)
 					{
 						table[glX][glY].nearBomb++;
-						//cout << "BOMB" << endl;
 					}
 
 				}
@@ -145,58 +142,26 @@ void init(mCase table[DIMX][DIMY])
 }
 
 
-// Recursive: Domino effect when 0 is hitten
-/*
-void recursive(mCase table[DIMX][DIMY])
+// Cascade Effect
+void autoDisplay(mCase table[DIMX][DIMY])
 {
-	struct coord
-	{
-		bool active = false;
-		int x, y;
-	};
-	coord queue[10000];
-	int i = 0;
 	for (glX = 1; glX < DIMX - 1; glX++)
 	{
 		for (glY = 1; glY < DIMY - 1; glY++)
 		{
-			if (table[glX][glY].isDisplayed && !table[glX][glY].isFlagged && !table[glX][glY].isScanned && table[glX][glY].nearBomb == 0)
+			if (table[glX][glY].isDisplayed && table[glX][glY].nearBomb == 0)
 			{
-				queue[i].active = true;
-				queue[i].x = glX;
-				queue[i].y = glY;
-				i++;
-			}
-		}
-	}
-	for (int j = 0; j < 10000; j++)
-	{
-		if (queue[j].active)
-		{
-			table[queue[j].x][queue[j].y].isScanned = true;
-			for (int x = queue[j].x - 1; x <= queue[j].x + 1; x++)
-			{
-				for (int y = queue[j].y - 1; y <= queue[j].y + 1; y++)
+				for (int x = glX - 1; x <= glX + 1; x++)
 				{
-					if (table[x][y].isVisible)
+					for (int y = glY - 1; y <= glY + 1; y++)
 					{
-						table[x][y].isDisplayed = true;
-						if (table[x][y].nearBomb == 0)
-						{
-							queue[i].active = true;
-							queue[i].x = x;
-							queue[i].y = y;
-							i++;
-						}
+						table[y][x].isDisplayed = true;
 					}
 				}
 			}
 		}
-		queue[j].active = false;
 	}
 }
-*/
-
 
 // Print in Console 
 void mPrint(mCase table[DIMX][DIMY])
@@ -297,7 +262,7 @@ void finish()
 	color(0, 0, 0);
 	print(55, WINY - 155, "Press Space to Exit");
 	fontSize(20);
-	
+
 }
 
 
@@ -305,7 +270,7 @@ void finish()
 void discover(mCase table[DIMX][DIMY], int x, int y)
 {
 	if (!table[x][y].isDisplayed && !table[x][y].isFlagged) return;
-	
+
 	int wX = x + SIZE * x;
 	int wY = 30 + -y + SIZE * (DIMY - 2 - y);
 
@@ -336,14 +301,13 @@ void leftClick(mCase table[DIMX][DIMY])
 	delay(150);
 
 	// Check if coords match a case, then get case with MousePos
-	#pragma region casecalc
-	if (mWon || mgameOver) return;
+#pragma region casecalc
 	if (x < 20 || x > WINX - 20 || y < 20 || y > WINY - 60) return;
 	if ((x - 20) % (SIZE + 1) == 0 || (y - 20) % (SIZE + 1) == 0) return;
 
 	int caseX = (x - 20) / (SIZE + 1) + 1;
 	int caseY = abs(((y - 20) / (SIZE + 1) + 1) - DIMY) - 1;
-	#pragma endregion
+#pragma endregion
 
 
 	if (DEBUG)
@@ -370,14 +334,13 @@ void rightClick(mCase table[DIMX][DIMY])
 	delay(150);
 
 	// Check if coords match a case, then get case with MousePos
-	#pragma region casecalc
-	if (mWon || mgameOver) return;
+#pragma region casecalc
 	if (x < 20 || x > WINX - 20 || y < 20 || y > WINY - 60) return;
 	if ((x - 20) % (SIZE + 1) == 0 || (y - 20) % (SIZE + 1) == 0) return;
-	
+
 	int caseX = (x - 20) / (SIZE + 1) + 1;
 	int caseY = abs(((y - 20) / (SIZE + 1) + 1) - DIMY) - 1;
-	#pragma endregion
+#pragma endregion
 
 	if (DEBUG)
 	{
@@ -399,13 +362,13 @@ void grapicInit()
 // Draw black grid
 void gridDrawer()
 {
-	for ( int vl = 20; vl < WINX - 20; vl += SIZE + 1 )
+	for (int vl = 20; vl < WINX - 20; vl += SIZE + 1)
 	{
 		color(0, 0, 0);
 		line(vl, 20, vl, WINY - 62);
 	}
-	
-	for ( int hl = 20; hl < WINY - 60; hl += SIZE + 1 )
+
+	for (int hl = 20; hl < WINY - 60; hl += SIZE + 1)
 	{
 		color(0, 0, 0);
 		line(20, hl, WINX - 22, hl);
@@ -447,6 +410,7 @@ void draw(mCase table[DIMX][DIMY])
 	gridDrawer();
 	if (isMousePressed(SDL_BUTTON_LEFT)) leftClick(table);
 	if (isMousePressed(SDL_BUTTON_RIGHT)) rightClick(table);
+	autoDisplay(table);
 	for (glX = 1; glX < DIMX - 1; glX++)
 	{
 		for (glY = 1; glY < DIMY - 1; glY++)
@@ -475,6 +439,6 @@ int main(int, char**)
 		stop = winDisplay();
 	}
 	winQuit();
-	//system("pause");
+	// system("pause");
 	return 0;
 }
